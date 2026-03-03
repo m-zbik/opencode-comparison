@@ -155,17 +155,22 @@ An **open-source AI coding agent** with 100K+ GitHub stars and 2.5M+ monthly dev
 
 # Model Flexibility: Use Any Model, Anytime
 
-**OpenCode Agent** (Terminal / Desktop / IDE Extension)
-connects via **AI SDK + Models.dev** to:
-
-| Cloud Providers | Local Models (Zero Cost) |
-|----------------|-------------------------|
-| **Claude Opus / Sonnet** (Anthropic) | **Ollama** / **llama.cpp** / **LM Studio** |
-| **GPT-5** (OpenAI) | **vLLM** / **Docker Model Runner** |
-| **Gemini** (Google Vertex) | Qwen2.5-Coder, DeepSeek R1 |
-| **GitHub Copilot** (existing sub) | Llama 3.3, Phi-4 |
-
-> **75+ providers supported.** Switch models in one config change -- no code changes needed.
+```
+┌─────────────────────────────────────────────────────┐
+│                    OpenCode Agent                    │
+│         (Terminal / Desktop / IDE Extension)         │
+├─────────────────────────────────────────────────────┤
+│                   AI SDK + Models.dev                │
+├──────────┬──────────┬───────────┬───────────────────┤
+│  Claude  │  GPT-5   │  Gemini   │  GitHub Copilot   │
+│  Opus    │  via     │  via      │  via existing      │
+│  Sonnet  │  OpenAI  │  Vertex   │  subscription      │
+├──────────┴──────────┴───────────┴───────────────────┤
+│              LOCAL MODELS (Zero Cost)                │
+│  Ollama │ llama.cpp │ LM Studio │ vLLM │ Docker MR  │
+│  Qwen2.5-Coder │ DeepSeek R1 │ Llama 3.3 │ Phi-4  │
+└─────────────────────────────────────────────────────┘
+```
 
 ---
 
@@ -216,23 +221,30 @@ OpenCode and GitHub Copilot are **complementary, not competing**:
 
 # Enterprise Setup: Zero Data Out
 
-### Everything stays inside your network
-
-**Developer Machines** run **OpenCode** with `opencode.json`:
-- `share: "disabled"` -- no data to opencode.ai
-- `providers: internal only` -- whitelist your AI gateway
-- `telemetry: off` -- zero instrumentation
-
-**Two paths for inference (both internal):**
-
-| Path | Technology | Network Traffic |
-|------|-----------|----------------|
-| **Internal AI Gateway** | Azure OpenAI / Bedrock / vLLM | Internal only |
-| **Local Models** | Ollama / llama.cpp on each machine | **Zero** -- fully air-gapped |
-
-**SSO Provider** integrates via central config.
-
-> **Nothing leaves your network boundary.**
+```
+┌──────────────────────────────────────────────────┐
+│                YOUR NETWORK                       │
+│                                                   │
+│  [Developer Machines]                             │
+│       │                                           │
+│       ▼                                           │
+│  [OpenCode]  ──config──>  opencode.json           │
+│       │                   • share: "disabled"      │
+│       │                   • providers: internal    │
+│       │                   • telemetry: off         │
+│       │                                           │
+│       ├──────> [Internal AI Gateway]              │
+│       │        (Azure OpenAI / Bedrock / vLLM)    │
+│       │                                           │
+│       └──────> [Local Ollama / llama.cpp]          │
+│                (Zero network traffic)              │
+│                                                   │
+│          ╔══════════════════════╗                  │
+│          ║  NOTHING LEAVES     ║                  │
+│          ║  THIS BOUNDARY      ║                  │
+│          ╚══════════════════════╝                  │
+└──────────────────────────────────────────────────┘
+```
 
 ---
 
@@ -302,17 +314,26 @@ In financial institutions, regulatory code analysis is **extremely labor-intensi
 
 # The Solution: AI Developer Agent Pipeline
 
-**Inputs:** Regulatory Document + Source Code + Data Source Definitions
-
-**Three agents run in sequence:**
-
-| Step | Agent | What It Does | Output |
-|------|-------|-------------|--------|
-| 1 | **@lineage-analyst** | Traces every attribute: source → transforms → output | Lineage report with file:line refs |
-| 2 | **@regulatory-verifier** | Maps each requirement to code | PASS / FAIL / PARTIAL matrix |
-| 3 | **@cda-mapper** | Identifies Tier 1-4 critical attributes | CDA mapping + quality risks |
-
-> Each agent reads the previous agent's output for full context. The pipeline runs in **1-2 hours** vs **1-3 weeks** manually.
+```
+┌─────────────────┐   ┌──────────────────────┐   ┌───────────────┐
+│  REGULATORY      │   │   SOURCE CODE         │   │  DATA SOURCE  │
+│  DOCUMENT        │   │   (SQL/Python/Java)   │   │  DEFINITIONS  │
+│  (IFRS 9, CRR)  │   │                       │   │  (YAML/Config)│
+└────────┬────────┘   └──────────┬────────────┘   └───────┬───────┘
+         └────────────┬──────────┴─────────────────────────┘
+                      ▼
+        ┌──────────────────────────┐
+        │   @lineage-analyst       │  Source → transforms → output
+        └────────────┬─────────────┘
+                     ▼
+        ┌──────────────────────────┐
+        │   @regulatory-verifier   │  PASS / FAIL / PARTIAL matrix
+        └────────────┬─────────────┘
+                     ▼
+        ┌──────────────────────────┐
+        │   @cda-mapper            │  Tier 1-4 CDA mapping + risks
+        └──────────────────────────┘
+```
 
 ---
 
